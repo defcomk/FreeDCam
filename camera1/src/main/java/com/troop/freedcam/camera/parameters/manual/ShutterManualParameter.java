@@ -192,8 +192,9 @@ public class ShutterManualParameter extends BaseManualParameter
         if (DeviceUtils.isZTEADV()||DeviceUtils.isZTEADVIMX214()||DeviceUtils.isZTEADV234()) {
             parameters.put("slow_shutter", "-1");
             parameters.put("slow_shutter_addition", "0");
+
         }
-        else if(DeviceUtils.isAlcatel_Idol3() || DeviceUtils.isMoto_MSM8982_8994())
+         if(DeviceUtils.isAlcatel_Idol3() || DeviceUtils.isMoto_MSM8982_8994())
         {
             parameters.put("exposure-time", "0");
         }
@@ -207,12 +208,19 @@ public class ShutterManualParameter extends BaseManualParameter
         {
             parameters.put("slow_shutter", shutterstring);
             parameters.put("slow_shutter_addition", "1");
-            if (i_shutter_changed != null) {
-                i_shutter_changed.PreviewWasRestarted();
+            //if (i_shutter_changed != null) {
+            //    i_shutter_changed.PreviewWasRestarted();
+           // }
+            if(Double.parseDouble(shutterstring) < 0.8)
+            {
+                baseCameraHolder.StopPreview();
+                Log.d("Manual_Shutter_class", "Nubia shutter restarted");
+                baseCameraHolder.StartPreview();
             }
-             baseCameraHolder.StopPreview();
-             baseCameraHolder.StartPreview();
-            i_cameraChangedListner.onPreviewOpen("restart");
+
+
+
+            //i_cameraChangedListner.onPreviewOpen("restart");
 
         }
         else if(DeviceUtils.isMoto_MSM8982_8994() || DeviceUtils.isAlcatel_Idol3())

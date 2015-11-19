@@ -11,6 +11,7 @@
 #include <time.h>
 #include <math.h>
 #include <android/log.h>
+#include <swab.h>
 #include <tiff/libtiff/tif_dir.h>
 #define  LOG_TAG    "freedcam.RawToDngNative"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
@@ -646,6 +647,88 @@ void processSXXX16(TIFF *tif,DngWriter *writer)
     TIFFClose(tif);
     LOGD("Free Memory");
 }
+unsigned char* SwapEveryFifth(unsigned char* _in)
+{
+    for (size_t i = 0; i < sizeof(_in); i+=5)
+    {
+        if (i % 5 == 0 && i+4 < sizeof(_in))
+        {
+            //std::swap(_in[i], _in[i+4]);
+            swab((char*)_in[i],(char*)_in[i+4],i+4);
+            // swap(_in[i], _in[i+4]);
+        }
+    }
+
+    return _in;
+}
+
+void processPacked10(TIFF *tif,DngWriter *writer)
+{
+    LOGD("IN SXXXXl0");
+    int i, j, row, col, b;
+    unsigned char *buffer, *dp;
+    unsigned char split; // single byte with 4 pairs of low-order bits
+    unsigned short pixel[writer->rawwidht]; // array holds 16 bits per pixel
+
+    LOGD("buffer set");
+    j=0;
+    if(writer->rowSize == 0)
+        writer->rowSize =  -(-5 * writer->rawwidht >> 5) << 3;
+    buffer =(unsigned char *)malloc(writer->rowSize);
+    memset( buffer, 0, writer->rowSize);
+    if (buffer == NULL)
+    {
+        LOGD("allocating buffer failed try again");
+        buffer =(unsigned char *)malloc(writer->rowSize);
+    }
+    LOGD("rowsize:%i", writer->rowSize);
+    //#pragma omp parallel for
+    for (row=0; row < writer->rawheight; row ++)
+    {
+        i = 0;
+        //#pragma omp parallel for
+        for(b = row * writer->rowSize; b < row * writer->rowSize + writer->rowSize; b++)
+            buffer[i++] = writer->bayerBytes[b];
+        j = 0;
+
+
+        for (dp=buffer, col = 0; col < writer->rawwidht; dp+=5, col+= 4)
+        {
+            // #pragma omp parallel for
+            for(int i = 0; i< 4; i++)
+            {
+                pixel[col+i] = (dp[i] <<2) | (dp[4] >> (i << 1) & 3);
+            }
+        }
+
+        if (TIFFWriteScanline(tif, pixel, row, 0) != 1) {
+            LOGD("Error writing TIFF scanline.");
+        }
+    }
+    LOGD("Write done");
+    //TIFFCheckpointDirectory(tif);
+    LOGD("write checkpoint");
+    TIFFWriteDirectory(tif);
+    LOGD("Finalizng DNG");
+    TIFFClose(tif);
+    LOGD("Free Memory");
+
+    if(buffer != NULL)
+    {
+        LOGD("Free Buffer");
+        free(buffer);
+        buffer = NULL;
+        LOGD("Freed Buffer");
+    }
+
+
+
+    //free(pixel);
+    LOGD("Mem Released");
+}
+
+
+
 
 void writeRawStuff(TIFF *tif, DngWriter *writer)
 {
@@ -681,6 +764,8 @@ void writeRawStuff(TIFF *tif, DngWriter *writer)
     }
     else if (writer->rawType == 2)
         processSXXX16(tif,writer);
+    else if (writer->rawType == 3)
+        processPacked10(tif,writer);
 }
 
 JNIEXPORT void JNICALL Java_com_troop_androiddng_RawToDng_WriteDNG(JNIEnv *env, jobject thiz, jobject handler)

@@ -548,8 +548,11 @@ public class CamParametersHandler extends AbstractParameterHandler
         SetAppSettingsToParameters();
         cameraHolder.SetCameraParameters(cameraParameters);
         //camMode();
-        //Mediatek();
 
+        //Mediatek();
+        if(DeviceUtils.isZTEADV()||DeviceUtils.isZTEADVIMX214()){
+            resetHWintergrationZTE();
+        }
     }
 
     class SetParameterRunner implements Runnable
@@ -734,6 +737,16 @@ public class CamParametersHandler extends AbstractParameterHandler
     public void SetAppSettingsToParameters() {
         super.SetAppSettingsToParameters();
         PreviewFormat.SetValue("yuv420sp", false);
+    }
+
+    private void resetHWintergrationZTE()
+    {
+        cameraParameters.put("slow_shutter", "-1");
+        cameraParameters.put("slow_shutter_addition", "0");
+
+        cameraHolder.SetCameraParameters(cameraParameters);
+        baseCameraHolder.StopPreview();
+        baseCameraHolder.StartPreview();
     }
 
     private void camMode()

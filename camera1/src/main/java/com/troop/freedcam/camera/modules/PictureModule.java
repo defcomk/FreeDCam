@@ -134,9 +134,9 @@ public class PictureModule extends AbstractModule implements I_WorkeDone {
         //if (ParameterHandler.DigitalImageStabilization.IsSupported() && ParameterHandler.DigitalImageStabilization.GetValue().equals("enable"))
             //ParameterHandler.DigitalImageStabilization.SetValue("disable", true);
 
-        if(DeviceUtils.isZTEADV()||DeviceUtils.isZTEADVIMX214()){
-            ((CamParametersHandler)ParameterHandler).setString("slow_shutter", "-1");
-            baseCameraHolder.SetCameraParameters(((CamParametersHandler)ParameterHandler).getParameters());}
+        //if(DeviceUtils.isZTEADV()||DeviceUtils.isZTEADVIMX214()){
+          //  ((CamParametersHandler)ParameterHandler).setString("slow_shutter", "-1");
+          //  baseCameraHolder.SetCameraParameters(((CamParametersHandler)ParameterHandler).getParameters());}
        // if(DeviceUtils.isNexus4()){
 
 
@@ -183,14 +183,14 @@ public class PictureModule extends AbstractModule implements I_WorkeDone {
     @Override
     public void OnWorkDone(File file)
     {
-        if ((DeviceUtils.isZTEADV() || DeviceUtils.isZTEADVIMX214() ||DeviceUtils.isZTEADV234()) && !baseCameraHolder.ParameterHandler.ManualShutter.GetStringValue().equals("Auto"))
+       /* if ((DeviceUtils.isZTEADV() || DeviceUtils.isZTEADVIMX214() ||DeviceUtils.isZTEADV234()) && !baseCameraHolder.ParameterHandler.ManualShutter.GetStringValue().equals("Auto"))
         {
             int s = baseCameraHolder.ParameterHandler.ManualShutter.GetValue();
             baseCameraHolder.ParameterHandler.ManualShutter.SetValue(0);
             baseCameraHolder.StartPreview();
             baseCameraHolder.ParameterHandler.ManualShutter.SetValue(s);
         }
-        else
+        else */
             baseCameraHolder.StartPreview();
         MediaScannerManager.ScanMedia(Settings.context.getApplicationContext() , file);
         stopworking();

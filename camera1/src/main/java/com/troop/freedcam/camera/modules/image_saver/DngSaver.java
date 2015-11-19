@@ -12,6 +12,7 @@ import com.drew.metadata.exif.ExifSubIFDDirectory;
 import com.troop.androiddng.RawToDng;
 import com.troop.freedcam.camera.BaseCameraHolder;
 import com.troop.freedcam.camera.parameters.CamParametersHandler;
+import com.troop.freedcam.utils.DeviceUtils;
 import com.troop.freedcam.utils.StringUtils;
 
 import java.io.BufferedInputStream;
@@ -64,7 +65,9 @@ public class DngSaver extends JpegSaver
         handler.post(new Runnable() {
             @Override
             public void run() {
-                processData(data, new File(StringUtils.getFilePath(externalSd, fileEnding)));
+                    processData(data, new File(StringUtils.getFilePath(externalSd, fileEnding)));
+
+
             }
         });
 
@@ -131,7 +134,18 @@ public class DngSaver extends JpegSaver
 
     }
 
+    private byte[] true10bit(byte[] in,int w, int h)
+    {
+        int chunkSize = w*h*10/8;
+       byte[] out = new byte[chunkSize];
+        if (in.length != chunkSize) {
+            byte[] smallerData = new byte[in.length];
+            System.arraycopy(out, 0, smallerData, 0, in.length);
+            out = smallerData;
+        }
 
+        return out;
+    }
 
     private void addExifAndThumbToDng(byte[] data)
     {

@@ -12,6 +12,8 @@ public class DngSupportedDevices
     public final static int Qcom = 1;
     public final static int Plain = 2;
 
+    public final static int packed10 = 3;
+
     public enum SupportedDevices
     {
         LG_G3,
@@ -156,6 +158,16 @@ public class DngSupportedDevices
                         Matrixes.Nexus6_noise_3x1_matrix);
             case 16473600: //oneplus
                 return new DngProfile(16,4224 ,3120 ,Mipi, BGGR, 5280,
+                        Matrixes.Nexus6_identity_matrix1,
+                        Matrixes.Nexus6_identity_matrix2,
+                        Matrixes.Nexus6_identity_neutra,
+                        Matrixes.Nexus6_foward_matrix1,
+                        Matrixes.Nexus6_foward_matrix2,
+                        Matrixes.Nexus6_reduction_matrix1,
+                        Matrixes.Nexus6_reduction_matrix2,
+                        Matrixes.Nexus6_noise_3x1_matrix);
+            case 16426800: //oneplus
+                return new DngProfile(64,4212 ,3120 ,packed10, BGGR, 5265,
                         Matrixes.Nexus6_identity_matrix1,
                         Matrixes.Nexus6_identity_matrix2,
                         Matrixes.Nexus6_identity_neutra,
