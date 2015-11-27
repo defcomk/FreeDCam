@@ -18,6 +18,7 @@ import com.troop.freedcam.utils.StringUtils;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.lang.reflect.Array;
 
 /**
  * Created by troop on 15.04.2015.
@@ -62,6 +63,11 @@ public class DngSaver extends JpegSaver
             return;
         awaitpicture =false;
         Log.d(TAG, "Take Picture Callback");
+
+       // final byte[] strip = new byte[16411200];
+       // System.arraycopy(data, 0, strip, 0, 16411200);
+
+
         handler.post(new Runnable() {
             @Override
             public void run() {

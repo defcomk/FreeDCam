@@ -82,14 +82,18 @@ public class FocusManualParameter extends  BaseManualParameter
     @Override
     public int GetValue()
     {
-        try {
-                return Integer.parseInt(parameters.get(value));
-        }
-        catch (Exception ex)
+        if(DeviceUtils.isZTEADV())
         {
-            Log.e(TAG, "get ManualFocus value failed");
+            return -1;
         }
-        return 0;
+        else {
+            try {
+                return Integer.parseInt(parameters.get(value));
+            } catch (Exception ex) {
+                Log.e(TAG, "get ManualFocus value failed");
+            }
+            return 0;
+        }
     }
 
     @Override
@@ -101,8 +105,10 @@ public class FocusManualParameter extends  BaseManualParameter
             {
 
                 camParametersHandler.FocusMode.SetValue("manual", true);
-                if (DeviceUtils.isZTEADV()||DeviceUtils.isZTEADVIMX214()||DeviceUtils.isZTEADV234())
+                if (DeviceUtils.isZTEADV()||DeviceUtils.isZTEADVIMX214()||DeviceUtils.isZTEADV234()) {
                     parameters.put("manual-focus-pos-type", "1");
+
+                }
             }
             else
                 camParametersHandler.FocusMode.SetValue("auto", true);
@@ -136,7 +142,8 @@ public class FocusManualParameter extends  BaseManualParameter
         }
         if (value != null && !value.equals("") && valueToSet > -1)
         {
-            parameters.put(value, valueToSet+"");
+
+            parameters.put(value, valueToSet + "");
         }
         camParametersHandler.SetParametersToCamera();
 

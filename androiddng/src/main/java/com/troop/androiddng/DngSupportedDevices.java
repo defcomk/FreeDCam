@@ -260,6 +260,10 @@ public class DngSupportedDevices
                         return new Nexus6Profile(64, 4208, 3082, Mipi, BGGR, getG3_rowSizeL);
                 }
             }
+            case 16411200://MIPI g2
+            {
+                return new Nexus6Profile(64, 4212, 3120, Mipi, BGGR, getG3_rowSizeL);
+        }
             case (16424960): {
                 switch (device) {
                     case Vivo_Xplay3s:
@@ -273,7 +277,7 @@ public class DngSupportedDevices
                     case OnePlusOne:
                         return new Nexus6Profile(64, 4212, 3082, Mipi, RGGb, getG3_rowSizeL);
                     case zteAdv:
-                        return new Nexus6Profile(64, 4208, 3120, Mipi, BGGR, getG3_rowSizeL);
+                        return new Nexus6Profile(64, 4208, 3120, packed10, BGGR, getG3_rowSizeL);
                     case zteADV_IMX214:
                         return new Nexus6Profile(64, 4208, 3120, Mipi, RGGb, getG3_rowSizeL);
                     case Lenovo_k910:

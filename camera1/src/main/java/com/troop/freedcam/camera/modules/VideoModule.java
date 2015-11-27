@@ -180,12 +180,20 @@ public class VideoModule extends AbstractModule
             recorder.setMaxDuration(7200000);
 
             ParameterHandler.PreviewFormat.SetValue("nv12-venus", true);
+            ParameterHandler.PreviewSize.SetValue("3840x2160",true);
+
+            if(DeviceUtils.isZTEADV() ||DeviceUtils.isZTEADVIMX214()) {
+                camParametersHandler.setString("preview-size", "3840x2160");
+                camParametersHandler.setString("video-size", "3840x2160");
+                //camParametersHandler.ManualShutter.SetValue("Auto",);
+                baseCameraHolder.SetCameraParameters(camParametersHandler.getParameters());
+            }
 
            // ParameterHandler.MemoryColorEnhancement.SetValue("disable",true);
            // ParameterHandler.DigitalImageStabilization.SetValue("disable", true);
            // ParameterHandler.Denoise.SetValue("denoise-off", true);
-            baseCameraHolder.StopPreview();
-            baseCameraHolder.StartPreview();
+           // baseCameraHolder.StopPreview();
+           // baseCameraHolder.StartPreview();
         }
 
 

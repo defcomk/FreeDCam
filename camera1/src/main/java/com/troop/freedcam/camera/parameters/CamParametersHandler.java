@@ -742,7 +742,8 @@ public class CamParametersHandler extends AbstractParameterHandler
     private void resetHWintergrationZTE()
     {
         cameraParameters.put("slow_shutter", "-1");
-        cameraParameters.put("slow_shutter_addition", "0");
+       // cameraParameters.put("slow_shutter_addition", "0");
+        cameraParameters.put("touch-af-aec", "touch-on");
 
         cameraHolder.SetCameraParameters(cameraParameters);
         baseCameraHolder.StopPreview();

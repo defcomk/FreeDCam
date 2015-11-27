@@ -13,8 +13,14 @@
 #include <android/log.h>
 #include <swab.h>
 #include <tiff/libtiff/tif_dir.h>
+#include <omp.h>
 #define  LOG_TAG    "freedcam.RawToDngNative"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
+
+#define MIN(a,b) \
+   ({ __typeof__ ((a)+(b)) _a = (a); \
+      __typeof__ ((a)+(b)) _b = (b); \
+     _a < _b ? _a : _b; })
 
 typedef unsigned long long uint64;
 typedef unsigned short UINT16;
@@ -269,7 +275,7 @@ void writeIfd0(TIFF *tif, DngWriter *writer)
     LOGD("width");
     assert(TIFFSetField(tif, TIFFTAG_IMAGELENGTH, writer->rawheight) != 0);
     LOGD("height");
-    assert(TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, 16) != 0);
+    assert(TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, 10) != 0);
     LOGD("bitspersample");
     assert(TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_CFA) != 0);
     LOGD("PhotometricCFA");
@@ -279,6 +285,22 @@ void writeIfd0(TIFF *tif, DngWriter *writer)
     TIFFSetField (tif, TIFFTAG_SAMPLESPERPIXEL, 1);
     LOGD("sampelsperpixel");
     TIFFSetField(tif, TIFFTAG_MAKE, writer->_make);
+    if (writer->rawType == 3)
+    {
+
+
+        LOGD("Writing Row Per Strip");
+        TIFFSetField(tif, TIFFTAG_ROWSPERSTRIP, writer->rawheight);
+        LOGD("Row per Strip done writing");
+        //TIFFSetField( tif, TIFFTAG_FILLORDER, FILLORDER_LSB2MSB  );
+
+
+       // TIFFTAG_STRIPOFFSETS
+
+       // LOGD("Endianess write");
+       // TIFFSetField( tif, TIFFTAG_FILLORDER, FILLORDER_LSB2MSB );
+       // LOGD("Endianess wrote");
+    }
     LOGD("make");
     TIFFSetField(tif, TIFFTAG_MODEL, writer->_model);
     LOGD("model");
@@ -345,6 +367,7 @@ void writeIfd0(TIFF *tif, DngWriter *writer)
 
 
 
+
     LOGD("colormatrix2");
        	    //////////////////////////////IFD POINTERS///////////////////////////////////////
        	                                ///GPS//////////
@@ -402,41 +425,6 @@ void makeGPS_IFD(TIFF *tif, DngWriter *writer)
         LOGD("Can't write Altitude" );
     }
     LOGD("Altitude Written");
-    /*if (!TIFFSetField( tif, GPSTAG_GPSDatestamp, gpsTime)) {
-        LOGD("Can't write gpsTime" );
-    }
-    LOGD("gpsTime Written");*/
-
-    //Altitude Takes Type BYTE
-    /*  if (!TIFFSetField( tif, GPSTAG_GPSAltitudeRef, alti)) {
-        LOGD("Can't write AltitudeRef" );
-
-    }*/
-    /*if (!TIFFSetField( tif, GPSTAG_GPSImgDirection, 68)) {
-        LOGD("Can't write IMG Directon" );
-    }
-    LOGD("I DIRECTION Written");
-    /*if (!TIFFSetField( tif, GPSTAG_GPSLongitude, "11deg 39' 33.410"))
-    {
-        LOGD("Can't write LongitudeRef" );
-    }*/
-    /*if (!TIFFSetField( tif, GPSTAG_GPSProccesingMethod, writer->Provider)) {
-        LOGD("Can't write Proc Method" );
-    }*/
-
-    /*if (!TIFFSetField( tif, GPSTAG_GPSImgDirectionRef, "M")) {
-        LOGD("Can't write IMG DIREC REf" );
-    }
-    LOGD("I DREF Written");
-
-    /* if (!TIFFSetField( tif, GPSTAG_GPSTimeStamp, 13/01/52)) {
-        LOGD("Can't write Tstamp" );
-    }
-    LOGD("TSAMP Written");*/
-    /*if (!TIFFSetField( tif, GPSTAG_GPSAltitudeRef, 1.)) {
-        LOGD("Can't write ALTIREF" );
-    }
-    LOGD("ALT Written");*/
 
 }
 
@@ -647,6 +635,90 @@ void processSXXX16(TIFF *tif,DngWriter *writer)
     TIFFClose(tif);
     LOGD("Free Memory");
 }
+
+struct raw10_twopix
+{
+    unsigned a_hi: 8;
+    unsigned b_hi: 2;
+    unsigned a_lo: 2;
+    unsigned b_lo: 8;
+} __attribute__((packed));
+
+unsigned char* ApplyOffset(unsigned char* _in)
+{
+
+
+    int i;
+    int frame_size = sizeof(_in);
+    int offset = 64;
+
+    struct raw10_twopix * buf2 = (struct raw10_twopix *) _in;
+
+    for (i = 0; i < frame_size / sizeof(struct raw10_twopix); i ++)
+    {
+        unsigned a = (buf2[i].a_hi << 2) | buf2[i].a_lo;
+        unsigned b = (buf2[i].b_hi << 8) | buf2[i].b_lo;
+
+        a = MIN(a + offset, 1023);
+        b = MIN(b + offset, 1023);
+
+        buf2[i].a_lo = a; buf2[i].a_hi = a >> 2;
+        buf2[i].b_lo = b; buf2[i].b_hi = b >> 8;
+    }
+
+    //return _in;
+    return (unsigned char*)buf2;
+}
+
+unsigned char* Swapbytes(unsigned char* _in)
+{
+
+    //char *p = _in;
+
+    size_t lo, hi;
+
+    for(lo=0, hi=sizeof(_in)-1; hi>lo; lo++, hi--)
+    {
+        char tmp=_in[lo];
+        _in[lo] = _in[hi];
+        _in[hi] = tmp;
+    }
+
+    return _in;
+}
+
+unsigned char* FillorderMSB(unsigned char* _in)
+{
+    unsigned char* msborder;
+    for (size_t i = 0; i < sizeof(_in); i+=5)
+    {
+
+    }
+
+    return _in;
+}
+
+unsigned char* byteSkipper(unsigned char* _in)
+{
+    unsigned char *tmpp;
+
+    for (size_t i = 0; i < sizeof(_in); i+=5264)
+    {
+        int h= 0;
+        for (int x = i-4; x > h; x--)
+        {
+
+
+            tmpp[x] = _in[x];
+        }
+        h=i;
+
+
+    }
+
+    return tmpp;
+}
+
 unsigned char* SwapEveryFifth(unsigned char* _in)
 {
     for (size_t i = 0; i < sizeof(_in); i+=5)
@@ -664,67 +736,135 @@ unsigned char* SwapEveryFifth(unsigned char* _in)
 
 void processPacked10(TIFF *tif,DngWriter *writer)
 {
-    LOGD("IN SXXXXl0");
-    int i, j, row, col, b;
-    unsigned char *buffer, *dp;
-    unsigned char split; // single byte with 4 pairs of low-order bits
-    unsigned short pixel[writer->rawwidht]; // array holds 16 bits per pixel
+    unsigned char* ar = writer->bayerBytes;
+    	unsigned char* tmp = new unsigned char[5];
+        int bytesToSkip = 0;
+        int realrowsize = writer->rawSize/writer->rawheight;
+        int shouldberowsize = writer->rawwidht*10/8;
+        LOGD("realrow: %i shoudlbe: %i", realrowsize, shouldberowsize);
+        if (realrowsize != shouldberowsize)
+            bytesToSkip = realrowsize - shouldberowsize;
+        int row = shouldberowsize;
+        unsigned char* out = new unsigned char[shouldberowsize*writer->rawheight];
+        int m = 0;
+        //writer->rowSize =  -(-5 * writer->rawwidht >> 5) << 3;
+    int i = 5;
+    do {
 
-    LOGD("buffer set");
-    j=0;
-    if(writer->rowSize == 0)
-        writer->rowSize =  -(-5 * writer->rawwidht >> 5) << 3;
-    buffer =(unsigned char *)malloc(writer->rowSize);
-    memset( buffer, 0, writer->rowSize);
-    if (buffer == NULL)
-    {
-        LOGD("allocating buffer failed try again");
-        buffer =(unsigned char *)malloc(writer->rowSize);
-    }
-    LOGD("rowsize:%i", writer->rowSize);
-    //#pragma omp parallel for
-    for (row=0; row < writer->rawheight; row ++)
-    {
-        i = 0;
-        //#pragma omp parallel for
-        for(b = row * writer->rowSize; b < row * writer->rowSize + writer->rowSize; b++)
-            buffer[i++] = writer->bayerBytes[b];
-        j = 0;
-
-
-        for (dp=buffer, col = 0; col < writer->rawwidht; dp+=5, col+= 4)
+        if(i == row)
         {
-            // #pragma omp parallel for
-            for(int i = 0; i< 4; i++)
-            {
-                pixel[col+i] = (dp[i] <<2) | (dp[4] >> (i << 1) & 3);
-            }
+            row += shouldberowsize +bytesToSkip;
+            i+=bytesToSkip;
+            LOGD("new row: %i", row/shouldberowsize);
         }
+        out[m++] = (ar[i]);
+        out[m++] =  (ar[i+4] & 0b00000011 ) <<6 | (ar[i+1] & 0b11111100)>>2;
+        out[m++] = (ar[i+1]& 0b00000011 )<< 6 | (ar[i+4] & 0b00001100 ) <<2 | (ar[i +2] & 0b11110000 )>> 4;
+        out[m++] = (ar[i+2] & 0b00001111 ) << 4 | (ar[i+4] & 0b00110000 )>> 2| (ar[i+3]& 0b11000000)>>6;
+        out[m++] = (ar[i+3]& 0b00111111)<<2 | (ar[i+4]& 0b11000000)>>6;
 
-        if (TIFFWriteScanline(tif, pixel, row, 0) != 1) {
-            LOGD("Error writing TIFF scanline.");
-        }
-    }
-    LOGD("Write done");
-    //TIFFCheckpointDirectory(tif);
-    LOGD("write checkpoint");
-    TIFFWriteDirectory(tif);
+        ++i;
+        ++i;
+        ++i;
+        ++i;
+        ++i;
+    } while (i <  writer->rawSize);
+
+    	TIFFWriteRawStrip(tif, 0, out, writer->rawheight*shouldberowsize);
+
+
+    TIFFWriteDirectory (tif);
     LOGD("Finalizng DNG");
     TIFFClose(tif);
-    LOGD("Free Memory");
 
-    if(buffer != NULL)
+    if (writer->bayerBytes == NULL)
+        return;
+    delete[] writer->bayerBytes;
+    writer->bayerBytes = NULL;
+}
+
+void processPacked10x(TIFF *tif,DngWriter *writer)
+{
+   LOGD("IN SXXXXl0");
+       int i, j, row, col, b;
+       unsigned char *buffer, *dp, *newray;
+       unsigned char split; // single byte with 4 pairs of low-order bits
+       unsigned short pixel[writer->rawwidht]; // array holds 16 bits per pixel
+
+       LOGD("buffer set");
+       j=0;
+       if(writer->rowSize == 0)
+           writer->rowSize =  -(-5 * writer->rawwidht >> 5) << 3;
+       buffer =(unsigned char *)malloc(writer->rowSize);
+       memset( buffer, 0, writer->rowSize);
+       if (buffer == NULL)
+       {
+           LOGD("allocating buffer failed try again");
+           buffer =(unsigned char *)malloc(writer->rowSize);
+       }
+       LOGD("rowsize:%i", writer->rowSize);
+
+       //TIFFWriteRawStrip(tif, 0,Swapbytes(writer->bayerBytes), writer->rawSize);
+
+
+      //#pragma omp parallel for
+
+
+    for (size_t i = 0; i < sizeof(writer->bayerBytes); i+=5)
     {
-        LOGD("Free Buffer");
-        free(buffer);
-        buffer = NULL;
-        LOGD("Freed Buffer");
+        int a = 0;
+        LOGD("in loop");
+        newray[a] = writer->bayerBytes[a];
+
+        a++;
+        LOGD("loop");
+        newray[a] = (writer->bayerBytes[a+4] & 0b00000011) << 6 | (writer->bayerBytes[a] & 0b11111100) >>2;
+
+        a++;
+        LOGD("loop");
+        newray[a] = (writer->bayerBytes[a-1] & 0b00000011) << 6 | (writer->bayerBytes[a+3] & 0b00001100) <<4| (writer->bayerBytes[a] & 0b11110000) >> 4 ;
+
+        a++;
+        LOGD("loop");
+        newray[a] =  (writer->bayerBytes[a-1] & 0b00001111) <<4 | (writer->bayerBytes[a+2] & 0b00110000) << 2 | (writer->bayerBytes[a] & 0b11000000) >> 6;
+
+        a++;
+        LOGD("loop");
+        newray[a+1] = (writer->bayerBytes[a-1] & 0b00111111) << 2| (writer->bayerBytes[a+1]  & 0b11000000) >> 6 ;
+
+        a++;
+        LOGD("loop");
+        a++;
+        LOGD("loop");
+
     }
 
 
 
-    //free(pixel);
-    LOGD("Mem Released");
+    LOGD("NewArraysize", sizeof(newray));
+    TIFFWriteRawStrip(tif, 0, newray, sizeof(newray));
+
+
+   	LOGD("Write done");
+   	//TIFFCheckpointDirectory(tif);
+       LOGD("write checkpoint");
+       TIFFWriteDirectory(tif);
+       LOGD("Finalizng DNG");
+       TIFFClose(tif);
+       LOGD("Free Memory");
+
+       if(buffer != NULL)
+       {
+           LOGD("Free Buffer");
+           free(buffer);
+           buffer = NULL;
+           LOGD("Freed Buffer");
+       }
+
+
+
+   	//free(pixel);
+   	LOGD("Mem Released");
 }
 
 
@@ -732,6 +872,7 @@ void processPacked10(TIFF *tif,DngWriter *writer)
 
 void writeRawStuff(TIFF *tif, DngWriter *writer)
 {
+
     if(0 == strcmp(writer->bayerformat,"bggr"))
         TIFFSetField (tif, TIFFTAG_CFAPATTERN, "\002\001\001\0");// 0 = Red, 1 = Green, 2 = Blue, 3 = Cyan, 4 = Magenta, 5 = Yellow, 6 = White
     if(0 == strcmp(writer->bayerformat , "grbg"))
