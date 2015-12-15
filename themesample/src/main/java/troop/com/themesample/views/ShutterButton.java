@@ -25,11 +25,13 @@ public class ShutterButton extends Button implements I_ModuleEvent, AbstractModu
 {
     AbstractCameraUiWrapper cameraUiWrapper;
     AnimationDrawable shutterOpenAnimation;
+    AnimationDrawable videoIsRec;
     IntervalHandler intervalHandler;
     AppSettingsManager appSettingsManager;
     String TAG = ShutterButton.class.getSimpleName();
     final int alpha = 150;
-    boolean isVideo = false;
+
+    CustomAnimationDrawableNew cad;
 
     public ShutterButton(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -82,18 +84,28 @@ public class ShutterButton extends Button implements I_ModuleEvent, AbstractModu
         intervalHandler = new IntervalHandler(appSettingsManager, cameraUiWrapper, messageHandler);
 
 
-        if (cameraUiWrapper.moduleHandler.GetCurrentModuleName().equals(AbstractModuleHandler.MODULE_VIDEO))
+        //Log.d(TAG,"Current Mode "+appSettingsManager.GetCurrentModule());
+
+        if (appSettingsManager.GetCurrentModule().equals(AbstractModuleHandler.MODULE_VIDEO))
         {
 
-            isVideo = true;
-            setBackgroundResource(R.drawable.video_recording);
-            shutterOpenAnimation = (AnimationDrawable) getBackground();
+
+            //setBackgroundResource(R.drawable.video_recording);
+           // videoIsRec = (AnimationDrawable) getBackground();
+
+            cad = new CustomAnimationDrawableNew((AnimationDrawable) getResources().getDrawable(R.drawable.video_recording)) {
+                @Override
+                void onAnimationFinish() {
+
+                }
+            };
+            setBackgroundDrawable(cad);
 
         }
         else
         {
 
-            isVideo = false;
+        //    isVideo = false;
             setBackgroundResource(R.drawable.shuttercloseanimation);
             //getBackground().setAlpha(alpha);
             shutterOpenAnimation = (AnimationDrawable) getBackground();
@@ -105,6 +117,22 @@ public class ShutterButton extends Button implements I_ModuleEvent, AbstractModu
 
     @Override
     public String ModuleChanged(String module) {
+        if (appSettingsManager.GetCurrentModule().equals(AbstractModuleHandler.MODULE_VIDEO))
+        {
+
+            setBackgroundResource(R.drawable.video_recording);
+            videoIsRec = (AnimationDrawable) getBackground();
+
+
+
+        }
+        else
+        {
+
+            setBackgroundResource(R.drawable.shuttercloseanimation);
+            //getBackground().setAlpha(alpha);
+            shutterOpenAnimation = (AnimationDrawable) getBackground();
+        }
 
         return null;
     }
@@ -115,14 +143,18 @@ public class ShutterButton extends Button implements I_ModuleEvent, AbstractModu
     @Override
     public void onWorkStarted()
     {
-        if(isVideo)
+
+        if (appSettingsManager.GetCurrentModule().equals(AbstractModuleHandler.MODULE_VIDEO))
         {
-            doAnim();
+           // doAnim();
+            cad.start();
         }
         else
         {
             doAnimP2();
         }
+
+
                 workerCounter++;
                 finishcounter = 0;
 
@@ -131,14 +163,11 @@ public class ShutterButton extends Button implements I_ModuleEvent, AbstractModu
     private void doAnim()
     {
 
-        setBackgroundResource(R.drawable.video_recording);
-
-
-        shutterOpenAnimation = (AnimationDrawable) getBackground();
-        if (shutterOpenAnimation .isRunning()) {
-            shutterOpenAnimation .stop();
+        if (videoIsRec.isRunning()) {
+            videoIsRec.stop();
     }
-        shutterOpenAnimation .start();
+
+        videoIsRec.start();
 
     }
 
@@ -190,8 +219,10 @@ public class ShutterButton extends Button implements I_ModuleEvent, AbstractModu
         this.post(new Runnable() {
             @Override
             public void run() {
-                if (isVideo) {
-                    doAnim();
+                if (appSettingsManager.GetCurrentModule().equals(AbstractModuleHandler.MODULE_VIDEO))
+                {
+                    //doAnim();
+                    cad.stop();
                 }
                 else
                 {
