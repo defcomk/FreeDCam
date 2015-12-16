@@ -12,6 +12,7 @@ import com.troop.freedcam.abstractcamera.R;
 public class DeviceUtils
 {
     public static Context contex;
+    boolean isDebugVersion = true;
 
     private static boolean isDevice(String[] ar)
     {
@@ -25,6 +26,11 @@ public class DeviceUtils
             }
         }
         return supported;
+    }
+
+    public static boolean isDebugging()
+    {
+        return isDebugging();
     }
 
     private static boolean containsDevice(String[] ar)

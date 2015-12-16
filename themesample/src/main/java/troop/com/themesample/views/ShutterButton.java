@@ -112,6 +112,8 @@ public class ShutterButton extends Button implements I_ModuleEvent, AbstractModu
     {
         if (isWorking)
             handlerLoop.postDelayed(runner, delay);
+        else
+            setBackgroundResource(R.drawable.video_recording);
             //handlerLoop.post(runner);
 
     }
@@ -202,6 +204,7 @@ public class ShutterButton extends Button implements I_ModuleEvent, AbstractModu
         aniDrawable.setDither(true);
         aniDrawable.setOneShot(false);
 
+
         aniDrawable.setOnFinishCallback(cb);
 
 
@@ -245,6 +248,7 @@ public class ShutterButton extends Button implements I_ModuleEvent, AbstractModu
                    // repeatT.stop();
                     //animatE();
                     isWorking = false;
+                    setBackgroundResource(R.drawable.video_recording);
 
 
                 } else {
