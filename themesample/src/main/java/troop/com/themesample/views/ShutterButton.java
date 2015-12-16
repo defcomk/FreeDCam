@@ -14,6 +14,8 @@ import com.troop.freedcam.i_camera.modules.AbstractModuleHandler;
 import com.troop.freedcam.i_camera.modules.I_ModuleEvent;
 import com.troop.freedcam.ui.AppSettingsManager;
 
+import java.util.Date;
+
 import troop.com.themesample.R;
 import troop.com.themesample.handler.IntervalHandler;
 import troop.com.themesample.handler.UserMessageHandler;
@@ -25,13 +27,17 @@ public class ShutterButton extends Button implements I_ModuleEvent, AbstractModu
 {
     AbstractCameraUiWrapper cameraUiWrapper;
     AnimationDrawable shutterOpenAnimation;
-    AnimationDrawable videoIsRec;
+
+    AnimationDrawable repeatT;
+
     IntervalHandler intervalHandler;
     AppSettingsManager appSettingsManager;
     String TAG = ShutterButton.class.getSimpleName();
     final int alpha = 150;
+    boolean isWorking = false;
+    Handler handlerLoop;
 
-    CustomAnimationDrawableNew cad;
+
 
     public ShutterButton(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -88,31 +94,40 @@ public class ShutterButton extends Button implements I_ModuleEvent, AbstractModu
 
         if (appSettingsManager.GetCurrentModule().equals(AbstractModuleHandler.MODULE_VIDEO))
         {
-
-
-            //setBackgroundResource(R.drawable.video_recording);
-           // videoIsRec = (AnimationDrawable) getBackground();
-
-            cad = new CustomAnimationDrawableNew((AnimationDrawable) getResources().getDrawable(R.drawable.video_recording)) {
-                @Override
-                void onAnimationFinish() {
-
-                }
-            };
-            setBackgroundDrawable(cad);
-
+            setBackgroundResource(R.drawable.video_recording);
+            //repeatT = (AnimationDrawable) getBackground();
         }
         else
         {
-
-        //    isVideo = false;
             setBackgroundResource(R.drawable.shuttercloseanimation);
             //getBackground().setAlpha(alpha);
             shutterOpenAnimation = (AnimationDrawable) getBackground();
         }
+        handlerLoop = new Handler();
 
 
     }
+
+    private void startLooperThread(int delay)
+    {
+        if (isWorking)
+            handlerLoop.postDelayed(runner, delay);
+            //handlerLoop.post(runner);
+
+    }
+
+    Runnable runner = new Runnable() {
+        @Override
+        public void run()
+        {
+            if (cameraUiWrapper == null)
+                return;
+            animatE();
+
+            startLooperThread(1000);
+
+        }
+    };
 
 
     @Override
@@ -121,10 +136,7 @@ public class ShutterButton extends Button implements I_ModuleEvent, AbstractModu
         {
 
             setBackgroundResource(R.drawable.video_recording);
-            videoIsRec = (AnimationDrawable) getBackground();
-
-
-
+           // repeatT = (AnimationDrawable) getBackground();
         }
         else
         {
@@ -146,8 +158,13 @@ public class ShutterButton extends Button implements I_ModuleEvent, AbstractModu
 
         if (appSettingsManager.GetCurrentModule().equals(AbstractModuleHandler.MODULE_VIDEO))
         {
-           // doAnim();
-            cad.start();
+            //repeatT.setOneShot(false);
+            //repeatT.start();
+            //animatE();
+            isWorking = true;
+            startLooperThread(0);
+
+
         }
         else
         {
@@ -160,56 +177,61 @@ public class ShutterButton extends Button implements I_ModuleEvent, AbstractModu
 
     }
 
-    private void doAnim()
-    {
 
-        if (videoIsRec.isRunning()) {
-            videoIsRec.stop();
+    private void animatE(){
+
+        Runnable registerSensorRunnable = new Runnable(){
+            @Override
+            public void run() {
+            }
+        };
+
+
+
+        registerAnimation(registerSensorRunnable);
+
     }
 
-        videoIsRec.start();
 
+
+    private void registerAnimation(final Runnable cb){
+
+        final CustomAnimationDrawableNew aniDrawable = new CustomAnimationDrawableNew((AnimationDrawable) getBackground());
+
+        setBackgroundDrawable(aniDrawable);
+        aniDrawable.setDither(true);
+        aniDrawable.setOneShot(false);
+
+        aniDrawable.setOnFinishCallback(cb);
+
+
+        if(!aniDrawable.isRunning()){
+            aniDrawable.start();
+        }
     }
 
-    private void doAnimP()
-    {
+    private void doAnimP() {
         setBackgroundResource(R.drawable.shutteropenanimation);
         //getBackground().setAlpha(alpha);
         shutterOpenAnimation = (AnimationDrawable) getBackground();
 
-        if (shutterOpenAnimation .isRunning()) {
-            shutterOpenAnimation .stop();
+        if (shutterOpenAnimation.isRunning()) {
+            shutterOpenAnimation.stop();
         }
         shutterOpenAnimation.setOneShot(true);
-        shutterOpenAnimation .start();
-
-     //   shutterOpenAnimation.stop();
-
-     //   shutterOpenAnimation.start();
+        shutterOpenAnimation.start();
     }
 
-    private void doAnimP2()
-    {
+    private void doAnimP2() {
         setBackgroundResource(R.drawable.shuttercloseanimation);
         //getBackground().setAlpha(alpha);
         shutterOpenAnimation = (AnimationDrawable) getBackground();
 
-        if (shutterOpenAnimation .isRunning()) {
-            shutterOpenAnimation .stop();
+        if (shutterOpenAnimation.isRunning()) {
+            shutterOpenAnimation.stop();
         }
         shutterOpenAnimation.setOneShot(true);
-        shutterOpenAnimation .start();
-
-        //   shutterOpenAnimation.stop();
-
-        //   shutterOpenAnimation.start();
-
-      //  setBackgroundResource(R.drawable.shuttercloseanimation);
-        // getBackground().setAlpha(alpha);
-       // shutterOpenAnimation = (AnimationDrawable) getBackground();
-      //  shutterOpenAnimation.stop();
-       // shutterOpenAnimation.setOneShot(true);
-      //  shutterOpenAnimation.start();
+        shutterOpenAnimation.start();
     }
 
 
@@ -219,13 +241,13 @@ public class ShutterButton extends Button implements I_ModuleEvent, AbstractModu
         this.post(new Runnable() {
             @Override
             public void run() {
-                if (appSettingsManager.GetCurrentModule().equals(AbstractModuleHandler.MODULE_VIDEO))
-                {
-                    //doAnim();
-                    cad.stop();
-                }
-                else
-                {
+                if (appSettingsManager.GetCurrentModule().equals(AbstractModuleHandler.MODULE_VIDEO)) {
+                   // repeatT.stop();
+                    //animatE();
+                    isWorking = false;
+
+
+                } else {
                     doAnimP();
                 }
             }
