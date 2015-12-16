@@ -13,6 +13,7 @@ import com.troop.freedcam.ui.AbstractFragment;
 import com.troop.freedcam.ui.AppSettingsManager;
 
 import troop.com.themesample.R;
+import troop.com.themesample.views.BlurDrawable;
 import troop.com.themesample.views.menu.MenuItem;
 import troop.com.themesample.views.menu.MenuItemBayerFormat;
 import troop.com.themesample.views.menu.MenuItemGPS;
@@ -162,6 +163,8 @@ public class LeftMenuFragment extends AbstractFragment  implements Interfaces.I_
         jpegQuality.SetStuff(i_activity, appSettingsManager, AppSettingsManager.SETTING_JPEGQUALITY);
         jpegQuality.SetParameter(wrapper.camParametersHandler.JpegQuality);
         jpegQuality.SetMenuItemListner(this);
+
+       // BlurDrawable blurDrawable = new BlurDrawable()
 
         /*histogram = (troop.com.themesample.views.menu.MenuItem)view.findViewById(R.id.MenuItemHistogram);
         histogram.SetStuff(i_activity,appSettingsManager, AppSettingsManager.SETTING_HISTOGRAM);
