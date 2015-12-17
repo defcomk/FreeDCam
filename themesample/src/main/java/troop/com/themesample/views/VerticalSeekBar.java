@@ -2,9 +2,12 @@ package troop.com.themesample.views;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.media.MediaPlayer;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.SeekBar;
+
+import troop.com.themesample.R;
 
 /**
  * Created by Ingo on 24.07.2015.
@@ -17,6 +20,7 @@ public class VerticalSeekBar extends SeekBar
 
     public VerticalSeekBar(Context context) {
         super(context);
+
     }
 
     public VerticalSeekBar(Context context, AttributeSet attrs, int defStyle) {
@@ -75,6 +79,7 @@ public class VerticalSeekBar extends SeekBar
                     i++;
                 if (event.getY() < getItemPos() + itemlength()/2)
                     i--;*/
+
 
                 if (i != lastcurrent)
                 {

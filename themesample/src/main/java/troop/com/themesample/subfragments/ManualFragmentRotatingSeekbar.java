@@ -1,6 +1,7 @@
 package troop.com.themesample.subfragments;
 
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -44,6 +45,7 @@ public class ManualFragmentRotatingSeekbar extends AbstractFragment implements I
     ManualButton convergence;
 
     ManualButton currentButton;
+    MediaPlayer wheel;
 
 
     //#################VIEW STUFF##############################
@@ -118,6 +120,7 @@ public class ManualFragmentRotatingSeekbar extends AbstractFragment implements I
         convergence = (ManualButton)view.findViewById(R.id.manual_convergence);
         convergence.SetStuff(appSettingsManager, AppSettingsManager.MCONVERGENCE);
         convergence.setOnClickListener(manualButtonClickListner);
+         wheel = MediaPlayer.create(view.getContext().getApplicationContext(), R.raw.wheel_adjuster_tone);
         return view;
     }
 
@@ -211,8 +214,12 @@ public class ManualFragmentRotatingSeekbar extends AbstractFragment implements I
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
     {
+
+        wheel.start();
         currentButton.setValueToParameters(progress);
         currentButton.onCurrentValueChanged(progress);
+       // wheel.stop();
+
     }
 
     @Override

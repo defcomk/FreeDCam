@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.media.MediaPlayer;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -295,6 +296,7 @@ public class RotatingSeekbar extends View
 
     public void setProgress(int progress)
     {
+
         //int item = ((currentPosToDraw + realMin) /itemHeight) *1;
         currentValue = progress;
         Log.d("RotatingSeekbar", "setprogres" +progress);
