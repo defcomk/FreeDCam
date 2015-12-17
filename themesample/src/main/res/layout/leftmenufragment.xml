@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/tap_ng">
+    android:background="#1f1f1f">
 
     <ScrollView
         android:layout_width="fill_parent"
@@ -36,7 +36,7 @@
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="@string/setting_video_group_header"
                     android:textColor="@color/menuTextColor"
-                    android:background="@color/uiSettingsBackground"
+                    android:background="#ffffff"
                     android:layout_marginBottom="1dp" />
 
                 <troop.com.themesample.views.menu.MenuItemVideoProfile
@@ -115,7 +115,7 @@
                     android:text="@string/timelapse_frames"
                     android:id="@+id/textView14"
                     android:textColor="@color/menuTextColor"
-                    android:background="@color/uiSettingsBackground" />
+                    android:background="#ffffff" />
 
                 <troop.com.themesample.views.menu.MenuItemTimeLapseFrames
                     android:layout_width="fill_parent"
@@ -140,7 +140,7 @@
                     android:text="@string/setting_picture_group_header"
                     android:id="@+id/textView4"
                     android:textColor="@color/menuTextColor"
-                    android:background="@color/uiSettingsBackground"
+                    android:background="#ffffff"
                     android:layout_marginBottom="1dp"
                     android:layout_marginLeft="0dp"
                     android:layout_marginRight="0dp" />
@@ -185,7 +185,7 @@
                     android:text="@string/setting_hdr_"
                     android:id="@+id/textView5"
                     android:textColor="@color/menuTextColor"
-                    android:background="#ffffffff"
+                    android:background="#ffffff"
                     android:layout_marginBottom="1dp"
                     android:layout_marginLeft="0dp"
                     android:layout_marginRight="0dp" />
@@ -208,7 +208,7 @@
                     android:text="@string/setting_Automation"
                     android:id="@+id/textView13"
                     android:textColor="@color/menuTextColor"
-                    android:background="@color/uiSettingsBackground"
+                    android:background="#ffffff"
                     android:layout_marginBottom="1dp"
                     android:layout_marginLeft="0dp"
                     android:layout_marginRight="0dp" />
@@ -261,7 +261,7 @@
                     android:text="@string/setting_freedcam_"
                     android:id="@+id/textView6"
                     android:textColor="@color/menuTextColor"
-                    android:background="@color/uiSettingsBackground"
+                    android:background="#ffffff"
                     android:layout_marginBottom="1dp"
                     android:layout_marginLeft="0dp"
                     android:layout_marginRight="0dp" />

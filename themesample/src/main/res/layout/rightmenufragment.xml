@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="fill_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#1d1d1d">
 
     <ScrollView
         android:layout_width="fill_parent"
@@ -20,7 +21,7 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="@string/setting_camera_"
                 android:id="@+id/legcset"
-                android:textColor="@color/menuTextColor"
+                android:textColor="#ffffff"
                 android:background="@color/uiSettingsBackground"
                 android:layout_marginBottom="1dp"
                 android:layout_marginLeft="0dp"
