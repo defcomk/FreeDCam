@@ -17,6 +17,8 @@ import freed.cam.apis.camera1.cameraholder.CameraHolderMTK;
 import freed.utils.AppSettingsManager;
 import freed.utils.DeviceUtils;
 
+import static com.troop.freedcam.R.array.ZTE_Z11;
+
 
 /**
  * Created by troop on 23.01.2017.
@@ -418,17 +420,11 @@ public class Camera1FeatureDetectorTask extends AbstractFeatureDetectorTask
 
     private void detectVirtualLensFilter(Camera.Parameters parameters)
     {
-        switch (appSettingsManager.getDevice())
-        {
-            case ZTE_ADV:
-            case ZTE_Z5SMINI:
-            case ZTE_Z11:
-                appSettingsManager.virtualLensfilter.setIsSupported(true);
-                break;
-            default:
-                appSettingsManager.virtualLensfilter.setIsSupported(false);
-                break;
-        }
+        if (Build.MODEL.contains("NX5"))
+            appSettingsManager.virtualLensfilter.setIsSupported(true);
+        else
+            appSettingsManager.virtualLensfilter.setIsSupported(false);
+
     }
 
     private void detectNonZslmanual(Camera.Parameters parameters) {

@@ -20,6 +20,7 @@
 package freed.cam.apis.camera1.parameters.modes;
 
 import android.hardware.Camera.Parameters;
+import android.os.Build;
 
 import com.troop.freedcam.R;
 
@@ -47,14 +48,8 @@ public class HDRModeParameter extends BaseModeParameter
         super(parameters, cameraUiWrapper);
         this.cameraUiWrapper = cameraUiWrapper;
         isSupported = false;
-        if (cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.XiaomiMI3W
-                || cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.XiaomiMI4W
-                ||cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.XiaomiMI_Note_Pro
-                ||cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.Xiaomi_RedmiNote
-                || cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.LG_G2
-                || cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.LG_G3
-                || cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.ZTE_ADV
-                || cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.Htc_M8)
+        if (Build.MODEL.contains("MI")
+                ||Build.MODEL.contains("NX") || Build.MODEL.contains("LG") || Build.MODEL.contains("HTC"))
         {
             isSupported = true;
         }
@@ -94,10 +89,7 @@ public class HDRModeParameter extends BaseModeParameter
 
     @Override
     public void SetValue(String valueToSet, boolean setToCam) {
-        if (cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.XiaomiMI3W
-                || cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.XiaomiMI4W
-                || cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.XiaomiMI_Note_Pro
-                || cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.Xiaomi_RedmiNote)
+        if (Build.MODEL.contains("MI"))
         {
             if (valueToSet.equals(cameraUiWrapper.getResString(R.string.on_))) {
                 parameters.set(cameraUiWrapper.getResString(R.string.morpho_hht), cameraUiWrapper.getResString(R.string.false_));
@@ -110,8 +102,7 @@ public class HDRModeParameter extends BaseModeParameter
                 parameters.set(cameraUiWrapper.getResString(R.string.morpho_hdr), cameraUiWrapper.getResString(R.string.false_));
             }
         }
-        else if(cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.LG_G2
-                || cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.LG_G3)
+        else if(Build.MODEL.contains("LG"))
         {
             if (valueToSet.equals(cameraUiWrapper.getResString(R.string.on_)))
                 parameters.set(cameraUiWrapper.getResString(R.string.hdr_mode), 1);
@@ -145,19 +136,15 @@ public class HDRModeParameter extends BaseModeParameter
 
     @Override
     public String GetValue() {
-        if (cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.XiaomiMI3W
-                || cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.XiaomiMI4W
-                || cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.XiaomiMI_Note_Pro
-                || cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.Xiaomi_RedmiNote) {
+        if (Build.MODEL.contains("MI")) {
             if (parameters.get(cameraUiWrapper.getResString(R.string.morpho_hdr)).equals(cameraUiWrapper.getResString(R.string.true_))
                     && parameters.get(cameraUiWrapper.GetAppSettingsManager().getResString(R.string.ae_bracket_hdr)).equals(cameraUiWrapper.GetAppSettingsManager().getResString(R.string.ae_bracket_hdr_values_aebracket)))
                 return cameraUiWrapper.getResString(R.string.on_);
             else
                 return cameraUiWrapper.getResString(R.string.off_);
         }
-        else if (cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.LG_G2
-                || cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.LG_G3
-                || cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.ZTE_ADV)
+        else if (Build.MODEL.contains("MI")
+                ||Build.MODEL.contains("NX") || Build.MODEL.contains("LG") || Build.MODEL.contains("HTC"))
         {
             if (parameters.get(cameraUiWrapper.getResString(R.string.hdr_mode))== null)
                 parameters.set(cameraUiWrapper.getResString(R.string.hdr_mode), "0");
@@ -187,14 +174,12 @@ public class HDRModeParameter extends BaseModeParameter
     public String[] GetValues() {
         List<String> hdrVals =  new ArrayList<>();
         hdrVals.add(cameraUiWrapper.getResString(R.string.off_));
-            if(cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.XiaomiMI3W
-                    || cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.XiaomiMI4W)
+            if(Build.MODEL.contains("MI"))
             {
                 hdrVals.add(cameraUiWrapper.getResString(R.string.on_));
             }
-            else if(cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.LG_G2
-                    || cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.LG_G3
-                    || cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.ZTE_ADV) {
+            else if(Build.MODEL.contains("MI")
+                    ||Build.MODEL.contains("NX") || Build.MODEL.contains("LG") || Build.MODEL.contains("HTC")) {
                 hdrVals.add(cameraUiWrapper.getResString(R.string.on_));
                 hdrVals.add(cameraUiWrapper.getResString(R.string.auto_));
             }
@@ -210,11 +195,8 @@ public class HDRModeParameter extends BaseModeParameter
     @Override
     public void onModuleChanged(String module)
     {
-        if(cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.XiaomiMI3W
-                || cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.XiaomiMI4W
-                || cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.LG_G2
-                || cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.LG_G3
-                || cameraUiWrapper.GetAppSettingsManager().getDevice() == Devices.ZTE_ADV
+        if(Build.MODEL.contains("MI")
+                ||Build.MODEL.contains("NX") || Build.MODEL.contains("LG") || Build.MODEL.contains("HTC")
                 || supportauto
                 || supporton) {
             curmodule = module;
