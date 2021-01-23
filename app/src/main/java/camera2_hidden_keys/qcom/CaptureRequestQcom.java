@@ -1,6 +1,7 @@
 package camera2_hidden_keys.qcom;
 
 import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.CaptureResult;
 import android.os.Build;
 
 import androidx.annotation.RequiresApi;
@@ -21,9 +22,7 @@ public class CaptureRequestQcom extends AbstractCaptureRequest {
     public static final CaptureRequest.Key<Byte> HDR10_VIDEO;
     public static final byte HDR10_VIDEO_ON = 2;
     public static final byte HDR10_VIDEO_OFF = 0;
-
-
-
+    public static final CaptureResult.Key<int[]> HISTOGRAM_STATS =null ;
 
 
     static {

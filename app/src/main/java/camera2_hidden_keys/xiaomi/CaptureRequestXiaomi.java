@@ -2,6 +2,7 @@ package camera2_hidden_keys.xiaomi;
 
 import android.annotation.TargetApi;
 import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.CaptureResult;
 import android.os.Build;
 
 import camera2_hidden_keys.AbstractCaptureRequest;
@@ -64,6 +65,7 @@ public class CaptureRequestXiaomi extends AbstractCaptureRequest {
     public static final CaptureRequest.Key<Boolean> CONTROL_ENABLE_REMOSAIC;
 
     public static final CaptureRequest.Key<Byte> PRO_VIDEO_LOG_ENABLED;
+    public static final CaptureResult.Key<int[]> HISTOGRAM_STATS_MTK = null;
 
 
     static {

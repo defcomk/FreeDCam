@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import androidx.annotation.RequiresApi;
 import camera2_hidden_keys.qcom.CaptureRequestQcom;
 import camera2_hidden_keys.xiaomi.CaptureRequestXiaomi;
 import freed.FreedApplication;
@@ -200,6 +201,7 @@ public class VideoModuleApi2 extends AbstractModuleApi2 {
         cameraUiWrapper.captureSessionHandler.CreateCaptureSession();
     }
 
+    @RequiresApi(api = VERSION_CODES.N)
     @Override
     public void startPreview() {
         Size previewSize;
@@ -313,21 +315,21 @@ public class VideoModuleApi2 extends AbstractModuleApi2 {
 
         OpCodes active_op = OpCodes.get(currentVideoProfile.preview_opcode);
 
-        if(active_op == OpCodes.eis_lookahead|| active_op == OpCodes.eis_realtime){
-            PicReader = ImageReader.newInstance(320, 240, ImageFormat.YUV_420_888, 2);
-            PicReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() {
-                @Override
-                public void onImageAvailable(ImageReader reader) {
-                    reader.acquireLatestImage().close();
-                }
-            },null);
+        //if(active_op == OpCodes.eis_lookahead|| active_op == OpCodes.eis_realtime||active_op == OpCodes.xiaomi_video){
+            PicReader = ImageReader.newInstance(320, 240, ImageFormat.JPEG, 2);
+        //    PicReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() {
+       ///         @Override
+     //           public void onImageAvailable(ImageReader reader) {
+     //               reader.acquireLatestImage().close();
+    //            }
+    //        },null);
             cameraUiWrapper.captureSessionHandler.AddSurface(PicReader.getSurface(), false);
-        }
-        else if (PicReader != null)
-        {
-            PicReader.close();
-            PicReader = null;
-        }
+     //   }
+     //   else if (PicReader != null)
+       // {
+     //       PicReader.close();
+       //     PicReader = null;
+      //  }
 
         if (active_op != OpCodes.off)
         {

@@ -8,9 +8,9 @@ import android.os.Build;
 import android.util.Pair;
 
 import androidx.annotation.RequiresApi;
+import camera2_hidden_keys.qcom.CaptureRequestQcom;
+import camera2_hidden_keys.xiaomi.CaptureRequestXiaomi;
 
-import camera2_hidden_keys.qcom.CaptureResultQcom;
-import camera2_hidden_keys.xiaomi.CaptureResultXiaomi;
 import freed.cam.apis.basecamera.parameters.AbstractParameter;
 import freed.cam.apis.basecamera.parameters.ParameterInterface;
 import freed.settings.Frameworks;
@@ -241,8 +241,8 @@ public class CameraValuesChangedCaptureCallback extends CameraCaptureSession.Cap
             waitForAe_af_lock.on_Ae_Af_Lock(aeAfLocker);
         }
         try {
-            if (result.get(CaptureResultQcom.HISTOGRAM_STATS) != null) {
-                int[] histo = result.get(CaptureResultQcom.HISTOGRAM_STATS);
+            if (result.get(CaptureRequestQcom.HISTOGRAM_STATS) != null) {
+                int[] histo = result.get(CaptureRequestQcom.HISTOGRAM_STATS);
                 if (histogramChangedEventListner != null) {
                     histogramChangedEventListner.onHistogramChanged(histo);
                 }
@@ -251,8 +251,8 @@ public class CameraValuesChangedCaptureCallback extends CameraCaptureSession.Cap
         catch (NullPointerException  |IllegalArgumentException ex)
         {}
         try {
-            if (result.get(CaptureResultXiaomi.HISTOGRAM_STATS_MTK) != null) {
-                int[] histo = result.get(CaptureResultXiaomi.HISTOGRAM_STATS_MTK);
+            if (result.get(CaptureRequestXiaomi.HISTOGRAM_STATS_MTK) != null) {
+                int[] histo = result.get(CaptureRequestXiaomi.HISTOGRAM_STATS_MTK);
                 if (histogramChangedEventListner != null) {
                     histogramChangedEventListner.onHistogramChanged(histo);
                 }
